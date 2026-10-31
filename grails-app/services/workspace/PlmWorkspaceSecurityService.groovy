@@ -14,18 +14,27 @@ class PlmWorkspaceSecurityService {
 
     @PostConstruct
     void init() {
-        def iconStream = this.class.getResourceAsStream('/workspace/workspace.svg')
-        if (iconStream == null) {
-            throw new IllegalStateException(
-                'Workspace icon missing: src/main/resources/workspace/workspace.svg'
-            )
+        log.info("WORKSPACE: Starting application registration")
+
+        def resource = this.class.getResourceAsStream('/workspace/workspace.svg')
+
+        if (resource == null) {
+            log.error("WORKSPACE: workspace.svg resource not found")
+            return
         }
-        String svg = iconStream.withCloseable { stream ->
-            new String(stream.readAllBytes(), 'UTF-8')
+
+        String svg = resource.withCloseable {
+            new String(it.readAllBytes(), 'UTF-8')
         }
+
         TaackAppRegisterService.register(
-            new TaackApp(WorkspaceController.&index as MethodClosure, svg)
+            new TaackApp(
+                WorkspaceController.&index as MethodClosure,
+                svg
+            )
         )
+
+        log.info("WORKSPACE: Application registered successfully")
     }
 
     boolean canView(PlmWorkspace workspace, User user) {
