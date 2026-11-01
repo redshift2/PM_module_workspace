@@ -4,6 +4,7 @@ import crew.User
 import plm.PlmFreeCadPart
 import grails.plugin.springsecurity.annotation.Secured
 
+
 @Secured(['ROLE_PLM_USER', 'ROLE_ADMIN'])
 class WorkspaceController {
     def springSecurityService

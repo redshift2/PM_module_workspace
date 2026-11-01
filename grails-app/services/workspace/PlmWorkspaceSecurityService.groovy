@@ -8,12 +8,18 @@ import taack.app.TaackAppRegisterService
 
 class PlmWorkspaceSecurityService {
 
+    // True only after the Workspace module has initialized successfully.
+    // The PLM serverInfo endpoint can inspect this flag when the module is present.
+    static volatile boolean FEATURE_GLOBAL_WORKSPACE = false
+
+
     // Eager initialization is needed so the application tile is registered
     // during server startup, even before a workspace action is requested.
     static lazyInit = false
 
     @PostConstruct
     void init() {
+        FEATURE_GLOBAL_WORKSPACE = false
         log.info("WORKSPACE: Starting application registration")
 
         def resource = this.class.getResourceAsStream('/workspace/workspace.svg')
@@ -34,6 +40,7 @@ class PlmWorkspaceSecurityService {
             )
         )
 
+        FEATURE_GLOBAL_WORKSPACE = true
         log.info("WORKSPACE: Application registered successfully")
     }
 
