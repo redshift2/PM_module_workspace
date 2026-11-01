@@ -31,6 +31,14 @@ class PlmWorkspaceService {
         new PlmWorkspace(owner: user, name: name?.trim(), description: description?.trim(), inventoryRevision: 0L)
                 .save(failOnError: true, flush: true)
     }
+    PlmWorkspace updateWorkspace(User user, Long id, String name, String description) {
+        PlmWorkspace w = PlmWorkspace.get(id)
+        require(plmWorkspaceSecurityService.isOwner(w, user))
+        w.name = name?.trim()
+        w.description = description?.trim()
+        w.save(failOnError: true, flush: true)
+        w
+    }
     PlmWorkspace duplicate(User user, Long sourceId, String name) {
         PlmWorkspace source = PlmWorkspace.get(sourceId)
         require(plmWorkspaceSecurityService.canView(source, user))

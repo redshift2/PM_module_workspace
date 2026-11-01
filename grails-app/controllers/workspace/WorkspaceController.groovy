@@ -10,14 +10,33 @@ class WorkspaceController {
     PlmWorkspaceService plmWorkspaceService
     PlmWorkspaceSyncService plmWorkspaceSyncService
     PlmWorkspaceSecurityService plmWorkspaceSecurityService
+    def plmFreeCadSecurityService
 
     private User user() { springSecurityService.currentUser as User }
-    def index() { [workspaces: plmWorkspaceService.accessible(user())] }
+    def index() { [workspaces: plmWorkspaceService.accessible(user()), currentUserId: user()?.id] }
     def show(Long id) {
         PlmWorkspace w = PlmWorkspace.get(id)
         if (!plmWorkspaceSecurityService.canView(w, user())) { response.sendError(403); return }
+        boolean canEdit = plmWorkspaceSecurityService.canEdit(w, user())
+        String partQuery = (params.partQuery ?: '').toString().trim().take(120)
+        List<PlmFreeCadPart> searchResults = []
+        if (canEdit && partQuery.length() >= 2) {
+            // Search current PLM parts by name or label, as in the PLM parts search.
+            String escaped = partQuery
+            searchResults = PlmFreeCadPart.createCriteria().list(max: 100) {
+                eq('active', true)
+                isNull('nextVersion')
+                or {
+                    ilike('originalName', "%${escaped}%")
+                    ilike('label', "%${escaped}%")
+                }
+                order('originalName', 'asc')
+            }.findAll { PlmFreeCadPart p ->
+                plmFreeCadSecurityService.canDownloadFile(p, user())
+            }.take(30)
+        }
         [workspace: w, inventory: plmWorkspaceSyncService.inventory(w, user()),
-         canEdit: plmWorkspaceSecurityService.canEdit(w, user()),
+         canEdit: canEdit, partQuery: partQuery, searchResults: searchResults,
          isOwner: plmWorkspaceSecurityService.isOwner(w, user()),
          members: PlmWorkspaceMember.findAllByWorkspace(w)]
     }
@@ -35,6 +54,15 @@ class WorkspaceController {
         if (request.method != 'POST') { response.sendError(405); return }
         try { def w = plmWorkspaceService.create(user(), params.name, params.description); redirect(action: 'show', id: w.id) }
         catch (Exception e) { flash.error = e.message; redirect(action: 'index') }
+    }
+    def updateWorkspace(Long id) {
+        if (request.method != 'POST') { response.sendError(405); return }
+        try {
+            plmWorkspaceService.updateWorkspace(user(), id, params.name, params.description)
+        } catch (Exception e) {
+            flash.error = e.message
+        }
+        redirect(action: 'index')
     }
     def duplicate(Long id) {
         if (request.method != 'POST') { response.sendError(405); return }
