@@ -14,7 +14,7 @@ class PlmWorkspaceSyncService {
             String recorded = entry.recordedVersion
             String latest = "${p.majorVersion ?: 1}.${p.minorVersion ?: 0}"
             parts[p.id.toString()] = [partId: p.id, name: entry.fileName,
-                file: entry.fileName, version: recorded, latestVersion: latest,
+                file: entry.fileName, originalName: p.originalName, version: recorded, latestVersion: latest,
                 updateAvailable: recorded != latest]
         }
         [workspaceId: w.id, name: w.name, inventoryRevision: w.inventoryRevision, parts: parts]
