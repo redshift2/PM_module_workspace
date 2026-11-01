@@ -71,8 +71,13 @@ class WorkspaceController {
     }
     def addPart(Long id, Long partId) {
         if (request.method != 'POST') { response.sendError(405); return }
-        try { plmWorkspaceService.addPart(user(), id, partId, params.long('inventoryRevision')); redirect(action: 'show', id: id) }
-        catch (Exception e) { flash.error = e.message; redirect(action: 'show', id: id) }
+        try {
+            plmWorkspaceService.addPart(user(), id, partId, params.long('inventoryRevision'))
+        } catch (Exception e) {
+            flash.error = e.message
+        }
+        // Use a root-relative URL to avoid a malformed redirect prefix.
+        response.sendRedirect("/workspace/show/${id}")
     }
     def removePart(Long id, Long partId) {
         if (request.method != 'POST') { response.sendError(405); return }
