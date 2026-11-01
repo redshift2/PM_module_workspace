@@ -46,8 +46,19 @@ class WorkspaceController {
                 plmFreeCadSecurityService.canDownloadFile(p, user())
             }.take(30)
         }
+        // Owner-only user lookup for the Share Workspace form.
+        String userQuery = (params.userQuery ?: '').toString().trim().take(80)
+        List<User> userSearchResults = []
+        if (plmWorkspaceSecurityService.isOwner(w, user()) && userQuery.length() >= 2) {
+            userSearchResults = User.createCriteria().list(max: 20) {
+                ilike('username', "%${userQuery}%")
+                ne('id', w.owner.id)
+                order('username', 'asc')
+            } as List<User>
+        }
         [workspace: w, inventory: plmWorkspaceSyncService.inventory(w, user()),
          canEdit: canEdit, partQuery: partQuery, searchResults: searchResults,
+         userQuery: userQuery, userSearchResults: userSearchResults,
          isOwner: plmWorkspaceSecurityService.isOwner(w, user()),
          members: PlmWorkspaceMember.findAllByWorkspace(w)]
     }

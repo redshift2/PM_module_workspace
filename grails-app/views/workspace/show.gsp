@@ -168,8 +168,29 @@ body .pmw .pmw-status-ok{color:#9bd9b2}
     <section class="pmw-card" id="share-workspace">
       <div class="pmw-card-title"><h2>Manage Access / Share Workspace</h2></div>
       <div class="pmw-card-content">
+        <g:form action="show" id="${workspace.id}" method="GET" class="pmw-form" style="margin-bottom:14px">
+          <div><label for="pmw-user-query">Search users by username</label>
+            <input id="pmw-user-query" name="userQuery" value="${userQuery?.encodeAsHTML()}" placeholder="Enter at least 2 characters" autocomplete="off"/></div>
+          <button type="submit" class="pmw-btn pmw-primary">Search Users</button>
+          <g:if test="${userQuery}"><g:link action="show" id="${workspace.id}" fragment="share-workspace" class="pmw-btn">Clear</g:link></g:if>
+        </g:form>
+        <g:if test="${userQuery?.size() >= 2}">
+          <div class="pmw-table-scroll" style="margin-bottom:14px">
+            <table>
+              <thead><tr><th>Matching username</th><th>Action</th></tr></thead>
+              <tbody>
+                <g:each in="${userSearchResults}" var="candidate">
+                  <tr><td>${candidate.username?.encodeAsHTML()}</td><td>
+                    <button type="button" class="pmw-btn pmw-primary" data-username="${candidate.username?.encodeAsHTML()}" onclick="document.getElementById('pmw-username').value=this.dataset.username;document.getElementById('pmw-username').focus();">Select User</button>
+                  </td></tr>
+                </g:each>
+                <g:if test="${!userSearchResults}"><tr><td colspan="2" class="pmw-muted">No matching users found.</td></tr></g:if>
+              </tbody>
+            </table>
+          </div>
+        </g:if>
         <g:form action="setMember" id="${workspace.id}" method="POST" class="pmw-form-grid">
-          <div><label for="pmw-username">Username</label><input id="pmw-username" name="username" required/></div>
+          <div><label for="pmw-username">Selected username</label><input id="pmw-username" name="username" required autocomplete="off" placeholder="Select from search results or enter username"/></div>
           <div><label for="pmw-role">Role</label><select id="pmw-role" name="role"><option value="VIEWER">Viewer</option><option value="EDITOR">Editor</option></select></div>
           <button type="submit" class="pmw-btn pmw-primary">Grant / Update Access</button>
         </g:form>
