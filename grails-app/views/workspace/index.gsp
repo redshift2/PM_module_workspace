@@ -46,7 +46,10 @@ body .pmw dialog input,body .pmw dialog select{width:100%}
 body .pmw dialog .pmw-actions{margin-top:16px;justify-content:flex-end}
 /* Restore the site-wide dark background and eliminate the white surround. */
 html,body{margin:0!important;padding:0!important;background:#22272e!important;color:#f0f3f7!important}
-body .pmw{max-width:none!important;margin:0!important}
+/* Pull the opaque blue header over the host layout's tiny page title. */
+body .pmw{max-width:none!important;margin:-36px 0 0!important;position:relative;z-index:2}
+body .pmw .pmw-header{position:relative;z-index:3}
+body .pmw .pmw-success{background:#244b37;color:#d8f5e2;padding:10px;border-radius:4px;margin:10px 0}
 </style>
 </head>
 <body>
@@ -59,6 +62,7 @@ body .pmw{max-width:none!important;margin:0!important}
     </div>
   </div>
   <g:if test="${flash.error}"><div class="pmw-error">${flash.error.encodeAsHTML()}</div></g:if>
+  <g:if test="${flash.message}"><div class="pmw-success">${flash.message.encodeAsHTML()}</div></g:if>
   <section class="pmw-card">
     <div class="pmw-card-title"><h2>Create Workspace</h2></div>
     <div class="pmw-card-content">
@@ -131,6 +135,37 @@ body .pmw{max-width:none!important;margin:0!important}
             </tr>
           </g:each>
           <g:if test="${!workspaces}"><tr><td colspan="5" class="pmw-muted">No accessible workspaces.</td></tr></g:if>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <section class="pmw-card" id="pmw-checked-out-parts">
+    <div class="pmw-card-title"><h2>My Checked-Out Parts</h2></div>
+    <div class="pmw-table-scroll">
+      <table>
+        <thead><tr><th>Part</th><th>CAD Version</th><th>Checked Out</th><th>Workspaces</th><th>Action</th></tr></thead>
+        <tbody>
+          <g:each in="${checkedOutParts}" var="row">
+            <tr>
+              <td><a href="/plm/showPart/${row.part.id}">${(row.part.label ?: row.part.originalName ?: 'Part ' + row.part.id).encodeAsHTML()}</a></td>
+              <td>${row.part.majorVersion}.${row.part.minorVersion}</td>
+              <td><g:formatDate date="${row.part.checkedOutAt}" format="yyyy-MM-dd HH:mm"/></td>
+              <td>
+                <g:if test="${row.workspaces}">
+                  <g:each in="${row.workspaces}" var="ws" status="idx">
+                    <g:if test="${idx > 0}">, </g:if><a href="/workspace/show/${ws.id}">${ws.name.encodeAsHTML()}</a>
+                  </g:each>
+                </g:if>
+                <g:else><span class="pmw-muted">Not in a workspace</span></g:else>
+              </td>
+              <td>
+                <form method="post" action="/workspace/undoCheckOut/${row.part.id}" onsubmit="return confirm('Undo check-out for this part?');">
+                  <button type="submit" class="pmw-btn pmw-danger">Undo Check-Out</button>
+                </form>
+              </td>
+            </tr>
+          </g:each>
+          <g:if test="${!checkedOutParts}"><tr><td colspan="5" class="pmw-muted">You have no checked-out parts.</td></tr></g:if>
         </tbody>
       </table>
     </div>
