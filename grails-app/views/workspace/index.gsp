@@ -1,24 +1,24 @@
 <!doctype html>
 <html>
 <head>
-<title>Workspace Manager</title>
+<meta name="layout" content="main"/>
+<title>PLM Workspaces</title>
 <style>
-/* Extend the dark theme to the entire page, not just the workspace panel. */
-html, body { min-height: 100%; background: #20252c !important; }
-body { margin: 0 !important; color: #dce2e8; }
 /* Self-contained styles: this server does not load Bootstrap on GSP pages. */
-body .pmw{font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#dce2e8;background:#20252c;padding:0 24px 24px;min-height:100vh}
+body .pmw{font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#dce2e8;background:#22272e;padding:0 24px 32px;min-height:100vh}
 body .pmw *{box-sizing:border-box}
 body .pmw h1{font-size:24px;margin:0;font-weight:600;color:#f4f6f8}
 body .pmw h2{font-size:16px;margin:0;color:#f4f6f8}
 body .pmw a{color:#7ab8e8;text-decoration:none}
 body .pmw a:hover{text-decoration:underline}
-body .pmw .pmw-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 -24px 18px;padding:16px 24px;background:#145b91;border-bottom:1px solid #3785bb;position:sticky;top:0;z-index:100;box-shadow:0 3px 10px #0004}
+body .pmw .pmw-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 -24px 18px;padding:17px 24px;background:#195d8f;min-height:72px}
 body .pmw .pmw-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 body .pmw .pmw-card{border:1px solid #454d56;background:#2c323a;border-radius:5px;margin-bottom:16px;overflow:hidden}
 body .pmw .pmw-card-title{background:#353d47;padding:11px 14px;border-bottom:1px solid #4b5561}
 body .pmw .pmw-card-content{padding:14px}
 body .pmw .pmw-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 11px;border:1px solid #596675;border-radius:4px;background:#414c58;color:#f0f4f8;font:inherit;cursor:pointer;text-decoration:none;min-height:34px}
+body .pmw .pmw-header .pmw-btn{background:#285e86;border-color:#8bb4d3;color:#fff}
+body .pmw .pmw-header .pmw-btn:hover{background:#377eaf}
 body .pmw .pmw-btn:hover{background:#526172;color:#fff;text-decoration:none}
 body .pmw .pmw-primary{background:#206ca3;border-color:#337fb7;color:#fff}
 body .pmw .pmw-danger{background:#6c3038;border-color:#93444e}
@@ -44,6 +44,9 @@ body .pmw dialog::backdrop{background:#0009}
 body .pmw dialog label{margin-top:10px}
 body .pmw dialog input,body .pmw dialog select{width:100%}
 body .pmw dialog .pmw-actions{margin-top:16px;justify-content:flex-end}
+/* Restore the site-wide dark background and eliminate the white surround. */
+html,body{margin:0!important;padding:0!important;background:#22272e!important;color:#f0f3f7!important}
+body .pmw{max-width:none!important;margin:0!important}
 </style>
 </head>
 <body>
